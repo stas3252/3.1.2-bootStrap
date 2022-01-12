@@ -39,13 +39,13 @@ public class SpringBootSecurityUsersBootstrapApplication implements CommandLineR
         roleRepository.save(admin);
         roleRepository.save(user);
 
-        userRepository.save(new User("Ivan", "Umen", 22, "admin@mail.com",
+        userRepository.save(new User("admin", "admin", 22, "admin@mail.com",
                 passwordEncoder.encode("admin"),
                 new HashSet<>() {{
                     add(admin);
                     add(user);
                 }}));
-        userRepository.save(new User("Stas", "Kosi", 21, "user@mail.com",
+        userRepository.save(new User("user", "user", 21, "user@mail.com",
                 passwordEncoder.encode("user"),
                 new HashSet<>() {{
                     add(user);

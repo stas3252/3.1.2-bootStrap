@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.itsinfo.springbootsecurityusersbootstrap.model.User;
-import ru.itsinfo.springbootsecurityusersbootstrap.service.AppService;
+import ru.itsinfo.springbootsecurityusersbootstrap.service.RoleService;
+import ru.itsinfo.springbootsecurityusersbootstrap.service.UserService;
 
 import javax.validation.*;
 
@@ -17,17 +18,19 @@ import javax.validation.*;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final AppService appService;
+    private final RoleService roleService;
+    private final UserService userService;
 
     @Autowired
-    public AdminController(AppService appService) {
-        this.appService = appService;
+    public AdminController(RoleService roleService, UserService userService) {
+        this.roleService = roleService;
+        this.userService = userService;
     }
 
     @GetMapping({"", "list"})
     public String showAllUsers(Model model) {
-        model.addAttribute("users", appService.findAllUsers());
-        model.addAttribute("allRoles", appService.findAllRoles());
+        model.addAttribute("users", userService.findAllUsers());
+        model.addAttribute("allRoles", roleService.findAllRoles());
 
         model.addAttribute("showUserProfile",
                 model.containsAttribute("user") && !((User) model.getAttribute("user")).isNew());
@@ -43,8 +46,8 @@ public class AdminController {
     @GetMapping("/{id}/profile")
     public String showUserProfileModal(@PathVariable("id") Long userId, Model model, RedirectAttributes attributes) {
         try {
-            model.addAttribute("allRoles", appService.findAllRoles());
-            model.addAttribute("user", appService.findUser(userId));
+            model.addAttribute("allRoles", roleService.findAllRoles());
+            model.addAttribute("user", userService.findUser(userId));
             return "fragments/user-form";
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
@@ -55,14 +58,14 @@ public class AdminController {
     public String updateUser(@Valid @ModelAttribute("user") User user,
                          BindingResult bindingResult,
                          RedirectAttributes redirectAttributes) {
-        appService.updateUser(user, bindingResult, redirectAttributes);
+        userService.updateUser(user, bindingResult, redirectAttributes);
 
         return "redirect:/admin";
     }
 
     @DeleteMapping("")
     public String deleteUser(@ModelAttribute("user") User user) {
-        appService.deleteUser(user.getId());
+        userService.deleteUser(user.getId());
         return "redirect:/admin";
     }
 
@@ -70,7 +73,7 @@ public class AdminController {
     public String insertUser(@Valid @ModelAttribute("user") User user,
                                    BindingResult bindingResult,
                                    RedirectAttributes redirectAttributes) {
-        appService.insertUser(user, bindingResult, redirectAttributes);
+        userService.insertUser(user, bindingResult, redirectAttributes);
 
         return "redirect:/admin";
     }
